@@ -88,7 +88,7 @@ export default function HomePage() {
       return;
     }
 
-    const exportData = agremiados.map((a) => ({
+    const exportData = agremiados.map((a: Agremiado) => ({
       COP: a.cop,
       NOMBRES: a.nombres,
       APELLIDOS: a.apellidos,
@@ -211,33 +211,30 @@ export default function HomePage() {
         <div className="mt-6 flex flex-wrap gap-3 justify-center">
           <button
             onClick={() => setActiveTab('busqueda')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
-              activeTab === 'busqueda'
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${activeTab === 'busqueda'
                 ? 'bg-[#6a0032] text-white shadow-md'
                 : 'bg-white text-[#6a0032] border border-[#6a0032] hover:bg-[#6a0032] hover:text-white'
-            }`}
+              }`}
           >
             <SearchIcon className="w-4 h-4" />
             Buscar
           </button>
           <button
             onClick={() => setActiveTab('registro')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
-              activeTab === 'registro'
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${activeTab === 'registro'
                 ? 'bg-[#6a0032] text-white shadow-md'
                 : 'bg-white text-[#6a0032] border border-[#6a0032] hover:bg-[#6a0032] hover:text-white'
-            }`}
+              }`}
           >
             <UserPlusIcon className="w-4 h-4" />
             Registrar
           </button>
           <button
             onClick={() => setActiveTab('lista')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
-              activeTab === 'lista'
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${activeTab === 'lista'
                 ? 'bg-[#6a0032] text-white shadow-md'
                 : 'bg-white text-[#6a0032] border border-[#6a0032] hover:bg-[#6a0032] hover:text-white'
-            }`}
+              }`}
           >
             <ListIcon className="w-4 h-4" />
             Ver Lista

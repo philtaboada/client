@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { Agremiado } from '@/types/agremiado';
+import type { Agremiado, PaginatedResponse } from '@/types/agremiado';
 import type { CreateAgremiadoInput, UpdateAgremiadoInput } from '@/lib/validations';
 
 /**
@@ -19,7 +19,7 @@ const API_BASE = '/api/agremiados';
 export function useAgremiados(page: number = 1, limit: number = 50) {
     return useQuery({
         queryKey: ['agremiados', page, limit],
-        queryFn: async () => {
+        queryFn: async (): Promise<PaginatedResponse<Agremiado>> => {
             const response = await fetch(`${API_BASE}?page=${page}&limit=${limit}`);
             if (!response.ok) {
                 const error = await response.json();
@@ -55,7 +55,7 @@ export function useAgremiado(id: number) {
 export function useSearchAgremiados(searchTerm: string, page: number = 1) {
     return useQuery({
         queryKey: ['agremiados', 'search', searchTerm, page],
-        queryFn: async () => {
+        queryFn: async (): Promise<PaginatedResponse<Agremiado>> => {
             const params = new URLSearchParams({
                 q: searchTerm,
                 page: page.toString(),
