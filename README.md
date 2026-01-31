@@ -1,36 +1,148 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sistema de Gestión de Agremiados
 
-## Getting Started
+Sistema web para registro y consulta de miembros del colegio profesional, desarrollado con Next.js, TypeScript, Prisma y PostgreSQL.
 
-First, run the development server:
+## 🚀 Características
 
+- ✅ CRUD completo de agremiados
+- 🔍 Búsqueda en tiempo real
+- 📊 Exportación a CSV
+- 📱 Diseño responsive
+- 🎨 UI moderna con Tailwind CSS
+- ⚡ React Query para gestión de estado
+- 🔒 Validación con Zod (cliente y servidor)
+
+## 📋 Requisitos Previos
+
+- Node.js 18+ 
+- PostgreSQL (o MySQL)
+- npm o pnpm
+
+## 🛠️ Instalación
+
+1. **Clonar el repositorio**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd nextjs-app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Instalar dependencias**
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Configurar variables de entorno**
+```bash
+cp .env.example .env
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Editar `.env` con tus credenciales de base de datos:
+```env
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
+```
 
-## Learn More
+4. **Ejecutar migraciones de Prisma**
+```bash
+npx prisma migrate dev --name init
+```
 
-To learn more about Next.js, take a look at the following resources:
+5. **Poblar base de datos con datos de ejemplo**
+```bash
+npx prisma db seed
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+6. **Iniciar servidor de desarrollo**
+```bash
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Abrir [http://localhost:3000](http://localhost:3000) en el navegador.
 
-## Deploy on Vercel
+## 📁 Estructura del Proyecto
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+src/
+├── app/
+│   ├── api/agremiados/          # API Routes
+│   ├── layout.tsx               # Layout principal
+│   ├── page.tsx                 # Página principal con tabs
+│   └── globals.css              # Estilos globales
+├── components/
+│   ├── ui/                      # Componentes UI base
+│   ├── agremiados/              # Componentes de agremiados
+│   └── Providers.tsx            # Context providers
+├── hooks/
+│   └── useAgremiados.ts         # React Query hooks
+├── lib/
+│   ├── prisma.ts                # Prisma client
+│   ├── validations.ts           # Esquemas Zod
+│   ├── utils.ts                 # Utilidades
+│   └── api-utils.ts             # Helpers de API
+└── types/
+    └── agremiado.ts             # TypeScript types
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔌 API Endpoints
+
+### Agremiados
+
+- `GET /api/agremiados` - Listar todos (con paginación)
+- `POST /api/agremiados` - Crear nuevo
+- `GET /api/agremiados/[id]` - Obtener por ID
+- `PUT /api/agremiados/[id]` - Actualizar
+- `DELETE /api/agremiados/[id]` - Eliminar
+- `GET /api/agremiados/search?q=term` - Buscar
+
+## 🗄️ Esquema de Base de Datos
+
+```prisma
+model Agremiado {
+  id                 Int        @id @default(autoincrement())
+  cop                String     @unique
+  nombres            String
+  apellidos          String
+  colegio            Colegio
+  estado             Estado
+  habilitado         Habilitado
+  fechaRegistro      DateTime   @default(now())
+  fechaActualizacion DateTime   @updatedAt
+}
+```
+
+## 🧪 Comandos Útiles
+
+```bash
+# Desarrollo
+npm run dev
+
+# Build producción
+npm run build
+npm run start
+
+# Prisma
+npx prisma studio          # Abrir Prisma Studio
+npx prisma migrate dev     # Crear nueva migración
+npx prisma db seed         # Poblar base de datos
+npx prisma generate        # Generar Prisma Client
+
+# Linting
+npm run lint
+```
+
+## 🎨 Tecnologías
+
+- **Framework**: Next.js 14 (App Router)
+- **Lenguaje**: TypeScript
+- **Base de Datos**: PostgreSQL
+- **ORM**: Prisma
+- **Estilos**: Tailwind CSS
+- **Gestión de Estado**: TanStack Query (React Query)
+- **Validación**: Zod
+- **Formularios**: React Hook Form
+
+## 📝 Licencia
+
+MIT
+
+## 👥 Autor
+
+Desarrollado para el Colegio de Profesionales

@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Modelo de Agremiado - Miembro del colegio profesional
+model Agremiado {
+  id                 Int        @id @default(autoincrement())
+  cop                String     @unique @db.VarChar(20)
+  nombres            String     @db.VarChar(100)
+  apellidos          String     @db.VarChar(100)
+  colegio            Colegio
+  estado             Estado     @default(ACTIVO)
+  habilitado         Habilitado @default(ACTIVO)
+  fechaRegistro      DateTime   @default(now())
+  fechaActualizacion DateTime   @updatedAt
+
+  @@index([cop], name: "idx_cop")
+  @@index([nombres, apellidos], name: "idx_nombre_completo")
+  @@index([colegio], name: "idx_colegio")
+  @@map("agremiados")
+}
+
+/// Enum para colegios regionales disponibles
+enum Colegio {
+  I_LIMA         @map("I LIMA")
+  II_AREQUIPA    @map("II AREQUIPA")
+  III_LIMA_CALLAO @map("III LIMA-CALLAO")
+  IV_TRUJILLO    @map("IV TRUJILLO")
+  V_PIURA        @map("V PIURA")
+  VI_CUSCO       @map("VI CUSCO")
+}
+
+/// Enum para estado del agremiado
+enum Estado {
+  ACTIVO
+  INACTIVO
+  SUSPENDIDO
+  RETIRADO
+}
+
+/// Enum para habilitación del agremiado
+enum Habilitado {
+  ACTIVO
+  INACTIVO
+}
