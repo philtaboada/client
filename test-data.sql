@@ -1,0 +1,8 @@
+-- Test data for agremiados table
+INSERT INTO agremiados (cop, nombres, apellidos, colegio, estado, habilitado)
+VALUES 
+('123456', 'MARÍA ELENA', 'GARCÍA RODRÍGUEZ', 'I_LIMA', 'ACTIVO', 'ACTIVO'),
+('234567', 'JUAN CARLOS', 'SÁNCHEZ LÓPEZ', 'II_AREQUIPA', 'ACTIVO', 'ACTIVO'),
+('345678', 'ANA PATRICIA', 'TORRES HUAMÁN', 'III_LIMA_CALLAO', 'ACTIVO', 'ACTIVO'),
+('456789', 'RICARDO JORGE', 'QUISPE MENDOZA', 'IV_TRUJILLO', 'INACTIVO', 'INACTIVO'),
+('567890', 'CARMEN ROSA', 'VILLANUEVA RUIZ', 'V_PIURA', 'ACTIVO', 'ACTIVO');

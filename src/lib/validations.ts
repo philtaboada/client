@@ -25,18 +25,18 @@ export const HabilitadoEnum = z.enum(['ACTIVO', 'INACTIVO']);
  */
 export const CreateAgremiadoSchema = z.object({
     cop: z
-        .string({ required_error: 'El número COP es requerido' })
+        .string()
         .min(1, 'El número COP es requerido')
         .regex(/^\d+$/, 'El COP debe contener solo números')
         .trim(),
     nombres: z
-        .string({ required_error: 'Los nombres son requeridos' })
+        .string()
         .min(2, 'Los nombres deben tener al menos 2 caracteres')
         .max(100, 'Los nombres no pueden exceder 100 caracteres')
         .trim()
         .transform((val) => val.toUpperCase()),
     apellidos: z
-        .string({ required_error: 'Los apellidos son requeridos' })
+        .string()
         .min(1, 'Los apellidos son requeridos')
         .max(100, 'Los apellidos no pueden exceder 100 caracteres')
         .trim()
@@ -58,7 +58,7 @@ export const UpdateAgremiadoSchema = CreateAgremiadoSchema.partial();
 export const SearchAgremiadoSchema = z.object({
     q: z.string().optional(),
     page: z.coerce.number().int().positive().default(1),
-    limit: z.coerce.number().int().positive().max(100).default(50),
+    limit: z.coerce.number().int().positive().max(1000).default(50),
 });
 
 // Type exports for TypeScript

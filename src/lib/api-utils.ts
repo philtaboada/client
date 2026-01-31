@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { Prisma } from '@prisma/client';
 import { ZodError } from 'zod';
 
 /**
@@ -30,7 +29,7 @@ export function handleApiError(error: unknown): NextResponse {
             {
                 error: 'Validation error',
                 message: 'Los datos proporcionados no son válidos',
-                details: error.errors.map((err) => ({
+                details: error.issues.map((err: any) => ({
                     field: err.path.join('.'),
                     message: err.message,
                 })),
@@ -50,28 +49,18 @@ export function handleApiError(error: unknown): NextResponse {
         );
     }
 
-    // Prisma errors
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        // Unique constraint violation
-        if (error.code === 'P2002') {
+    // Database errors (Postgres)
+    if (typeof error === 'object' && error !== null && 'code' in error) {
+        const pgError = error as { code: string; meta?: any };
+
+        // Unique constraint violation (23505)
+        if (pgError.code === '23505') {
             return NextResponse.json(
                 {
                     error: 'Duplicate entry',
                     message: 'Este número COP ya está registrado',
-                    details: error.meta,
                 },
                 { status: 409 }
-            );
-        }
-
-        // Record not found
-        if (error.code === 'P2025') {
-            return NextResponse.json(
-                {
-                    error: 'Not found',
-                    message: 'El agremiado no fue encontrado',
-                },
-                { status: 404 }
             );
         }
     }

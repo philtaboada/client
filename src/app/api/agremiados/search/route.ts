@@ -1,8 +1,10 @@
 import { NextRequest } from 'next/server';
-import prisma from '@/lib/prisma';
+// import { query } from '@/lib/db';
 import { SearchAgremiadoSchema } from '@/lib/validations';
 import { handleApiError, paginatedResponse } from '@/lib/api-utils';
-import { Prisma } from '@prisma/client';
+import { Agremiado } from '@/types/agremiado';
+// Import test data for demo
+import testData from '../../../../../test-data.json';
 
 /**
  * GET /api/agremiados/search
@@ -12,40 +14,40 @@ export async function GET(request: NextRequest) {
     try {
         const searchParams = request.nextUrl.searchParams;
         const { q, page, limit } = SearchAgremiadoSchema.parse({
-            q: searchParams.get('q'),
-            page: searchParams.get('page'),
-            limit: searchParams.get('limit'),
+            q: searchParams.get('q') || undefined,
+            page: searchParams.get('page') || undefined,
+            limit: searchParams.get('limit') || undefined,
         });
 
-        const skip = (page - 1) * limit;
+        // --- MOCKED FOR DEMO ---
+        let filteredData = (testData as any[]).map(a => ({
+            ...a,
+            fechaRegistro: new Date(a.fechaRegistro),
+            fechaActualizacion: new Date(a.fechaActualizacion)
+        })) as Agremiado[];
 
-        // Build search conditions
-        const searchConditions: Prisma.AgremiadoWhereInput = q
-            ? {
-                OR: [
-                    { cop: { contains: q, mode: 'insensitive' } },
-                    { nombres: { contains: q, mode: 'insensitive' } },
-                    { apellidos: { contains: q, mode: 'insensitive' } },
-                    { colegio: { equals: q.toUpperCase().replace(/ /g, '_') as any } },
-                ],
-            }
-            : {};
+        if (q) {
+            const query = q.toLowerCase();
+            filteredData = filteredData.filter(a =>
+                a.cop.includes(query) ||
+                a.nombres.toLowerCase().includes(query) ||
+                a.apellidos.toLowerCase().includes(query)
+            );
+        }
 
-        const [agremiados, total] = await Promise.all([
-            prisma.agremiado.findMany({
-                where: searchConditions,
-                skip,
-                take: limit,
-                orderBy: {
-                    fechaRegistro: 'desc',
-                },
-            }),
-            prisma.agremiado.count({
-                where: searchConditions,
-            }),
-        ]);
+        const total = filteredData.length;
+        const offset = (page - 1) * limit;
+        const paginatedData = filteredData.slice(offset, offset + limit);
 
-        return paginatedResponse(agremiados, total, page, limit);
+        return paginatedResponse(paginatedData, total, page, limit);
+
+        /* --- ORIGINAL DATABASE LOGIC ---
+        const offset = (page - 1) * limit;
+
+        let sql = 'SELECT * FROM agremiados';
+        ...
+        return paginatedResponse(results.rows, total, page, limit);
+        */
     } catch (error) {
         return handleApiError(error);
     }

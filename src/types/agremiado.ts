@@ -1,12 +1,22 @@
-import { Agremiado, Colegio, Estado, Habilitado } from '@prisma/client';
-
 /**
  * Type definitions for Agremiado entity
- * Extends Prisma types with additional utility types
  */
 
-// Re-export Prisma types
-export type { Agremiado, Colegio, Estado, Habilitado };
+export type Colegio = 'I_LIMA' | 'II_AREQUIPA' | 'III_LIMA_CALLAO' | 'IV_TRUJILLO' | 'V_PIURA' | 'VI_CUSCO';
+export type Estado = 'ACTIVO' | 'INACTIVO' | 'SUSPENDIDO' | 'RETIRADO';
+export type Habilitado = 'ACTIVO' | 'INACTIVO';
+
+export interface Agremiado {
+    id: number;
+    cop: string;
+    nombres: string;
+    apellidos: string;
+    colegio: Colegio;
+    estado: Estado;
+    habilitado: Habilitado;
+    fechaRegistro: Date;
+    fechaActualizacion: Date;
+}
 
 /**
  * Agremiado without auto-generated fields (for creation)

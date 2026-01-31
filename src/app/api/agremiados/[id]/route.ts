@@ -1,11 +1,14 @@
 import { NextRequest } from 'next/server';
-import prisma from '@/lib/prisma';
+// import { query } from '@/lib/db';
 import { UpdateAgremiadoSchema } from '@/lib/validations';
 import {
     handleApiError,
     successResponse,
     ApiError,
 } from '@/lib/api-utils';
+import { Agremiado } from '@/types/agremiado';
+// Import test data for demo
+import testData from '../../../../../test-data.json';
 
 /**
  * GET /api/agremiados/[id]
@@ -23,15 +26,34 @@ export async function GET(
             throw new ApiError(400, 'ID inválido');
         }
 
-        const agremiado = await prisma.agremiado.findUnique({
-            where: { id: agremiadoId },
-        });
+        // --- MOCKED FOR DEMO ---
+        const agremiado = (testData as any[]).find(a => a.id === agremiadoId);
 
         if (!agremiado) {
             throw new ApiError(404, 'Agremiado no encontrado');
         }
 
-        return successResponse(agremiado);
+        // Convert dates
+        const formattedAgremiado: Agremiado = {
+            ...agremiado,
+            fechaRegistro: new Date(agremiado.fechaRegistro),
+            fechaActualizacion: new Date(agremiado.fechaActualizacion)
+        } as Agremiado;
+
+        return successResponse(formattedAgremiado);
+
+        /* --- ORIGINAL DATABASE LOGIC ---
+        const result = await query<Agremiado>(
+            'SELECT * FROM agremiados WHERE id = $1',
+            [agremiadoId]
+        );
+
+        if (result.rowCount === 0) {
+            throw new ApiError(404, 'Agremiado no encontrado');
+        }
+
+        return successResponse(result.rows[0]);
+        */
     } catch (error) {
         return handleApiError(error);
     }
@@ -56,12 +78,42 @@ export async function PUT(
         const body = await request.json();
         const validatedData = UpdateAgremiadoSchema.parse(body);
 
-        const agremiado = await prisma.agremiado.update({
-            where: { id: agremiadoId },
-            data: validatedData,
+        // --- MOCKED FOR DEMO ---
+        const agremiado = (testData as any[]).find(a => a.id === agremiadoId);
+        if (!agremiado) {
+            throw new ApiError(404, 'Agremiado no encontrado');
+        }
+
+        return successResponse({
+            ...agremiado,
+            ...validatedData,
+            fechaActualizacion: new Date()
         });
 
-        return successResponse(agremiado);
+        /* --- ORIGINAL DATABASE LOGIC ---
+        const updates = Object.keys(validatedData);
+        if (updates.length === 0) {
+            throw new ApiError(400, 'No hay campos para actualizar');
+        }
+
+        const setClause = updates.map((key, i) => `"${key}" = $${i + 1}`).join(', ');
+        const values = [...Object.values(validatedData), agremiadoId];
+
+        const sql = `
+            UPDATE agremiados 
+            SET ${setClause}, "fechaActualizacion" = NOW()
+            WHERE id = $${values.length}
+            RETURNING *
+        `;
+
+        const result = await query<Agremiado>(sql, values);
+
+        if (result.rowCount === 0) {
+            throw new ApiError(404, 'Agremiado no encontrado');
+        }
+
+        return successResponse(result.rows[0]);
+        */
     } catch (error) {
         return handleApiError(error);
     }
@@ -83,11 +135,23 @@ export async function DELETE(
             throw new ApiError(400, 'ID inválido');
         }
 
-        await prisma.agremiado.delete({
-            where: { id: agremiadoId },
-        });
+        // --- MOCKED FOR DEMO ---
+        const exists = (testData as any[]).some(a => a.id === agremiadoId);
+        if (!exists) {
+            throw new ApiError(404, 'Agremiado no encontrado');
+        }
 
         return new Response(null, { status: 204 });
+
+        /* --- ORIGINAL DATABASE LOGIC ---
+        const result = await query('DELETE FROM agremiados WHERE id = $1', [agremiadoId]);
+
+        if (result.rowCount === 0) {
+            throw new ApiError(404, 'Agremiado no encontrado');
+        }
+
+        return new Response(null, { status: 204 });
+        */
     } catch (error) {
         return handleApiError(error);
     }
