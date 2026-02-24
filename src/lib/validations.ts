@@ -15,6 +15,12 @@ export const ColegioEnum = z.enum([
     'VI_CUSCO',
 ]);
 
+/** Accepts enum values or any string (e.g. from CSV: "I-PIURA", "III-LIMA CALLAO") */
+export const ColegioEnumOrString = z.union([
+    ColegioEnum,
+    z.string().min(1, 'El colegio es requerido'),
+]);
+
 export const EstadoEnum = z.enum(['ACTIVO', 'INACTIVO', 'SUSPENDIDO', 'RETIRADO']);
 
 export const HabilitadoEnum = z.enum(['ACTIVO', 'INACTIVO']);
@@ -41,7 +47,7 @@ export const CreateAgremiadoSchema = z.object({
         .max(100, 'Los apellidos no pueden exceder 100 caracteres')
         .trim()
         .transform((val) => val.toUpperCase()),
-    colegio: ColegioEnum,
+    colegio: ColegioEnumOrString,
     estado: EstadoEnum.default('ACTIVO'),
     habilitado: HabilitadoEnum.default('ACTIVO'),
 });

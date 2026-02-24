@@ -7,8 +7,7 @@ import {
     paginatedResponse,
 } from '@/lib/api-utils';
 import { Agremiado } from '@/types/agremiado';
-// Import test data for demo
-import testData from '../../../../test-data.json';
+import { getAgremiadosData } from '@/lib/agremiados-data';
 
 /**
  * GET /api/agremiados
@@ -23,19 +22,17 @@ export async function GET(request: NextRequest) {
             limit: searchParams.get('limit') || undefined,
         });
 
-        // --- MOCKED FOR DEMO ---
-        let filteredData = (testData as any[]).map(a => ({
-            ...a,
-            fechaRegistro: new Date(a.fechaRegistro),
-            fechaActualizacion: new Date(a.fechaActualizacion)
-        })) as Agremiado[];
+        const testData = getAgremiadosData();
+        let filteredData = [...testData];
 
         if (q) {
             const query = q.toLowerCase();
-            filteredData = filteredData.filter(a =>
-                a.cop.includes(query) ||
-                a.nombres.toLowerCase().includes(query) ||
-                a.apellidos.toLowerCase().includes(query)
+            filteredData = filteredData.filter(
+                (a) =>
+                    a.cop.includes(query) ||
+                    a.nombres.toLowerCase().includes(query) ||
+                    a.apellidos.toLowerCase().includes(query) ||
+                    String(a.colegio).toLowerCase().includes(query)
             );
         }
 

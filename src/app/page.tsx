@@ -3,11 +3,11 @@
 import * as React from 'react';
 import Image from 'next/image';
 import { useAgremiados } from '@/hooks/useAgremiados';
-import { FormularioRegistro } from '@/components/agremiados/FormularioRegistro';
 import { BusquedaAgremiados } from '@/components/agremiados/BusquedaAgremiados';
 import { TablaAgremiados } from '@/components/agremiados/TablaAgremiados';
 import { ModalDetalles } from '@/components/agremiados/ModalDetalles';
 import { Button } from '@/components/ui/Button';
+import { Pagination } from '@/components/ui/Pagination';
 import { useToast } from '@/components/ui/Toast';
 import { exportToCSV, formatDate } from '@/lib/utils';
 import type { Agremiado } from '@/types/agremiado';
@@ -17,15 +17,7 @@ import type { Agremiado } from '@/types/agremiado';
  * Styled with institutional colors: Burgundy (#6a0032) & Gold (#d4af37)
  */
 
-type TabType = 'registro' | 'busqueda' | 'lista';
-
-function UserPlusIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
-    </svg>
-  );
-}
+type TabType = 'busqueda' | 'lista';
 
 function SearchIcon({ className }: { className?: string }) {
   return (
@@ -51,44 +43,45 @@ function DownloadIcon({ className }: { className?: string }) {
   );
 }
 
+const PAGE_SIZE = 25;
+
 export default function HomePage() {
   const [activeTab, setActiveTab] = React.useState<TabType>('busqueda');
+  const [currentPage, setCurrentPage] = React.useState(1);
   const [selectedAgremiado, setSelectedAgremiado] = React.useState<Agremiado | null>(null);
-  const [editingAgremiado, setEditingAgremiado] = React.useState<Agremiado | null>(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
-  const { data, isLoading } = useAgremiados(1, 1000);
+  const { data, isLoading } = useAgremiados(currentPage, PAGE_SIZE);
   const { showToast } = useToast();
 
   const agremiados = data?.data || [];
   const totalCount = data?.total || 0;
+  const totalPages = data?.totalPages || 1;
 
   const handleView = (agremiado: Agremiado) => {
     setSelectedAgremiado(agremiado);
     setIsModalOpen(true);
   };
 
-  const handleEdit = (agremiado: Agremiado) => {
-    setEditingAgremiado(agremiado);
-    setActiveTab('registro');
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
-  const handleDelete = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleFormSuccess = () => {
-    setEditingAgremiado(null);
-    setActiveTab('lista');
-  };
-
-  const handleExport = () => {
-    if (agremiados.length === 0) {
+  const handleExport = async () => {
+    if (totalCount === 0) {
       showToast('No hay datos para exportar', 'warning');
       return;
     }
-
-    const exportData = agremiados.map((a: Agremiado) => ({
+    try {
+      const limit = Math.min(totalCount, 1000);
+      const response = await fetch(`/api/agremiados?page=1&limit=${limit}`);
+      const result = await response.json();
+      const allData = result.data || [];
+      if (allData.length === 0) {
+        showToast('No hay datos para exportar', 'warning');
+        return;
+      }
+      const exportData = allData.map((a: Agremiado) => ({
       COP: a.cop,
       NOMBRES: a.nombres,
       APELLIDOS: a.apellidos,
@@ -98,9 +91,12 @@ export default function HomePage() {
       FECHA_REGISTRO: formatDate(a.fechaRegistro),
     }));
 
-    const filename = `agremiados_${new Date().toISOString().slice(0, 10)}.csv`;
-    exportToCSV(exportData, filename);
-    showToast('Datos exportados exitosamente', 'success');
+      const filename = `agremiados_${new Date().toISOString().slice(0, 10)}.csv`;
+      exportToCSV(exportData, filename);
+      showToast('Datos exportados exitosamente', 'success');
+    } catch {
+      showToast('Error al exportar datos', 'error');
+    }
   };
 
   return (
@@ -138,32 +134,7 @@ export default function HomePage() {
               <h2 className="text-xl md:text-2xl font-semibold text-[#d4af37] mb-6">
                 Buscar agremiado por COP o Apellidos y Nombres
               </h2>
-              <BusquedaAgremiados onEdit={handleEdit} onView={handleView} />
-            </div>
-          </div>
-        )}
-
-        {/* Registration Tab */}
-        {activeTab === 'registro' && (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden animate-in fade-in duration-300">
-            <div className="p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
-                <div className="w-10 h-10 rounded-lg bg-[#6a0032]/10 flex items-center justify-center">
-                  <UserPlusIcon className="w-5 h-5 text-[#6a0032]" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    {editingAgremiado ? 'Editar Agremiado' : 'Registro de Nuevo Agremiado'}
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    {editingAgremiado ? 'Modifica los datos del agremiado' : 'Complete el formulario para registrar'}
-                  </p>
-                </div>
-              </div>
-              <FormularioRegistro
-                agremiado={editingAgremiado || undefined}
-                onSuccess={handleFormSuccess}
-              />
+              <BusquedaAgremiados onView={handleView} />
             </div>
           </div>
         )}
@@ -197,11 +168,19 @@ export default function HomePage() {
                   <p className="mt-4 text-gray-500">Cargando...</p>
                 </div>
               ) : (
+                <>
                 <TablaAgremiados
-                  agremiados={agremiados}
-                  onEdit={handleEdit}
-                  onView={handleView}
+                    agremiados={agremiados}
+                    onView={handleView}
                 />
+                  <Pagination
+                    page={currentPage}
+                    totalPages={totalPages}
+                    total={totalCount}
+                    limit={PAGE_SIZE}
+                    onPageChange={handlePageChange}
+                  />
+                </>
               )}
             </div>
           </div>
@@ -218,16 +197,6 @@ export default function HomePage() {
           >
             <SearchIcon className="w-4 h-4" />
             Buscar
-          </button>
-          <button
-            onClick={() => setActiveTab('registro')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${activeTab === 'registro'
-                ? 'bg-[#6a0032] text-white shadow-md'
-                : 'bg-white text-[#6a0032] border border-[#6a0032] hover:bg-[#6a0032] hover:text-white'
-              }`}
-          >
-            <UserPlusIcon className="w-4 h-4" />
-            Registrar
           </button>
           <button
             onClick={() => setActiveTab('lista')}
@@ -256,8 +225,6 @@ export default function HomePage() {
         agremiado={selectedAgremiado}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
       />
     </div>
   );

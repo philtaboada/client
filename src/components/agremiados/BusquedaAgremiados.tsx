@@ -13,7 +13,6 @@ import type { Agremiado } from '@/types/agremiado';
  */
 
 interface BusquedaAgremiadosProps {
-    onEdit?: (agremiado: Agremiado) => void;
     onView?: (agremiado: Agremiado) => void;
 }
 
@@ -34,7 +33,6 @@ function InfoIcon({ className }: { className?: string }) {
 }
 
 export function BusquedaAgremiados({
-    onEdit,
     onView,
 }: BusquedaAgremiadosProps) {
     const [searchTerm, setSearchTerm] = React.useState('');
@@ -138,7 +136,6 @@ export function BusquedaAgremiados({
                     ) : (
                         <TablaAgremiados
                             agremiados={agremiados}
-                            onEdit={onEdit}
                             onView={onView}
                         />
                     )}

@@ -7,8 +7,7 @@ import {
     ApiError,
 } from '@/lib/api-utils';
 import { Agremiado } from '@/types/agremiado';
-// Import test data for demo
-import testData from '../../../../../test-data.json';
+import { getAgremiadosData } from '@/lib/agremiados-data';
 
 /**
  * GET /api/agremiados/[id]
@@ -26,21 +25,14 @@ export async function GET(
             throw new ApiError(400, 'ID inválido');
         }
 
-        // --- MOCKED FOR DEMO ---
-        const agremiado = (testData as any[]).find(a => a.id === agremiadoId);
+        const testData = getAgremiadosData();
+        const agremiado = testData.find((a) => a.id === agremiadoId);
 
         if (!agremiado) {
             throw new ApiError(404, 'Agremiado no encontrado');
         }
 
-        // Convert dates
-        const formattedAgremiado: Agremiado = {
-            ...agremiado,
-            fechaRegistro: new Date(agremiado.fechaRegistro),
-            fechaActualizacion: new Date(agremiado.fechaActualizacion)
-        } as Agremiado;
-
-        return successResponse(formattedAgremiado);
+        return successResponse(agremiado);
 
         /* --- ORIGINAL DATABASE LOGIC ---
         const result = await query<Agremiado>(
@@ -78,8 +70,8 @@ export async function PUT(
         const body = await request.json();
         const validatedData = UpdateAgremiadoSchema.parse(body);
 
-        // --- MOCKED FOR DEMO ---
-        const agremiado = (testData as any[]).find(a => a.id === agremiadoId);
+        const testData = getAgremiadosData();
+        const agremiado = testData.find((a) => a.id === agremiadoId);
         if (!agremiado) {
             throw new ApiError(404, 'Agremiado no encontrado');
         }
@@ -135,8 +127,8 @@ export async function DELETE(
             throw new ApiError(400, 'ID inválido');
         }
 
-        // --- MOCKED FOR DEMO ---
-        const exists = (testData as any[]).some(a => a.id === agremiadoId);
+        const testData = getAgremiadosData();
+        const exists = testData.some((a) => a.id === agremiadoId);
         if (!exists) {
             throw new ApiError(404, 'Agremiado no encontrado');
         }

@@ -143,6 +143,10 @@ export function FormularioRegistro({
                         label="Colegio Regional"
                         options={[
                             { value: '', label: 'Seleccionar colegio...' },
+                            ...(agremiado?.colegio &&
+                            !COLEGIO_OPTIONS.some((o) => o.value === agremiado.colegio)
+                                ? [{ value: agremiado.colegio, label: String(agremiado.colegio) }]
+                                : []),
                             ...COLEGIO_OPTIONS,
                         ]}
                         error={errors.colegio?.message}

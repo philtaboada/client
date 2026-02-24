@@ -11,7 +11,7 @@ export interface Agremiado {
     cop: string;
     nombres: string;
     apellidos: string;
-    colegio: Colegio;
+    colegio: Colegio | string; // string for CSV data (e.g. "I-PIURA", "III-LIMA CALLAO")
     estado: Estado;
     habilitado: Habilitado;
     fechaRegistro: Date;
