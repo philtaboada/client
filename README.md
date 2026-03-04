@@ -14,7 +14,9 @@ Sistema web para registro y consulta de miembros del colegio profesional, desarr
 
 ## 📋 Requisitos Previos
 
-- Node.js 18+ 
+- Node.js 18+
+
+- 
 - PostgreSQL (o MySQL)
 - npm o pnpm
 
