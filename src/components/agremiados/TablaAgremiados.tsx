@@ -14,6 +14,9 @@ import type { Agremiado } from '@/types/agremiado';
 interface TablaAgremiadosProps {
     agremiados: Agremiado[];
     onView?: (agremiado: Agremiado) => void;
+    isAdmin?: boolean;
+    onEdit?: (agremiado: Agremiado) => void;
+    onDelete?: (agremiado: Agremiado) => void;
 }
 
 function EmptyIcon({ className }: { className?: string }) {
@@ -27,6 +30,9 @@ function EmptyIcon({ className }: { className?: string }) {
 export function TablaAgremiados({
     agremiados,
     onView,
+    isAdmin,
+    onEdit,
+    onDelete,
 }: TablaAgremiadosProps) {
     if (agremiados.length === 0) {
         return (
@@ -103,7 +109,7 @@ export function TablaAgremiados({
                                 <StatusBadge status={agremiado.habilitado} type="habilitado" />
                             </td>
                             <td className="px-4 py-3 text-center">
-                                <div className="flex items-center justify-center gap-1">
+                                <div className="flex items-center justify-center gap-1 flex-wrap">
                                     {onView && (
                                         <button
                                             onClick={() => onView(agremiado)}
@@ -113,6 +119,26 @@ export function TablaAgremiados({
                                             title="Ver detalles"
                                         >
                                             Ver más
+                                        </button>
+                                    )}
+                                    {isAdmin && onEdit && (
+                                        <button
+                                            onClick={() => onEdit(agremiado)}
+                                            className="px-3 py-1.5 bg-[#6a0032] text-white rounded-full text-xs font-semibold
+                                                     hover:bg-[#4a0022] transition-all"
+                                            title="Editar"
+                                        >
+                                            Editar
+                                        </button>
+                                    )}
+                                    {isAdmin && onDelete && (
+                                        <button
+                                            onClick={() => onDelete(agremiado)}
+                                            className="px-3 py-1.5 bg-red-600 text-white rounded-full text-xs font-semibold
+                                                     hover:bg-red-700 transition-all"
+                                            title="Eliminar"
+                                        >
+                                            Eliminar
                                         </button>
                                     )}
                                 </div>

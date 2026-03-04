@@ -17,12 +17,18 @@ interface ModalDetallesProps {
     agremiado: Agremiado | null;
     isOpen: boolean;
     onClose: () => void;
+    isAdmin?: boolean;
+    onEdit?: (agremiado: Agremiado) => void;
+    onDelete?: (agremiado: Agremiado) => void;
 }
 
 export function ModalDetalles({
     agremiado,
     isOpen,
     onClose,
+    isAdmin,
+    onEdit,
+    onDelete,
 }: ModalDetallesProps) {
     if (!agremiado) return null;
 
@@ -76,7 +82,17 @@ export function ModalDetalles({
                 </div>
 
                 {/* Actions */}
-                <div className="flex justify-center pt-2">
+                <div className="flex justify-center gap-2 pt-2 flex-wrap">
+                    {isAdmin && onEdit && (
+                        <Button variant="accent" onClick={() => { onEdit(agremiado); onClose(); }}>
+                            Editar
+                        </Button>
+                    )}
+                    {isAdmin && onDelete && (
+                        <Button variant="danger" onClick={() => { onDelete(agremiado); onClose(); }}>
+                            Eliminar
+                        </Button>
+                    )}
                     <Button variant="outline" onClick={onClose}>
                         Cerrar
                     </Button>

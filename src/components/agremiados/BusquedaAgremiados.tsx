@@ -14,6 +14,9 @@ import type { Agremiado } from '@/types/agremiado';
 
 interface BusquedaAgremiadosProps {
     onView?: (agremiado: Agremiado) => void;
+    isAdmin?: boolean;
+    onEdit?: (agremiado: Agremiado) => void;
+    onDelete?: (agremiado: Agremiado) => void;
 }
 
 function SearchIcon({ className }: { className?: string }) {
@@ -34,6 +37,9 @@ function InfoIcon({ className }: { className?: string }) {
 
 export function BusquedaAgremiados({
     onView,
+    isAdmin,
+    onEdit,
+    onDelete,
 }: BusquedaAgremiadosProps) {
     const [searchTerm, setSearchTerm] = React.useState('');
     const [debouncedTerm, setDebouncedTerm] = React.useState('');
@@ -137,6 +143,9 @@ export function BusquedaAgremiados({
                         <TablaAgremiados
                             agremiados={agremiados}
                             onView={onView}
+                            isAdmin={isAdmin}
+                            onEdit={onEdit}
+                            onDelete={onDelete}
                         />
                     )}
                 </div>

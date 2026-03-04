@@ -145,7 +145,7 @@ export function FormularioRegistro({
                             { value: '', label: 'Seleccionar colegio...' },
                             ...(agremiado?.colegio &&
                             !COLEGIO_OPTIONS.some((o) => o.value === agremiado.colegio)
-                                ? [{ value: agremiado.colegio, label: String(agremiado.colegio) }]
+                                ? [{ value: String(agremiado.colegio), label: String(agremiado.colegio) }]
                                 : []),
                             ...COLEGIO_OPTIONS,
                         ]}

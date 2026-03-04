@@ -33,7 +33,7 @@ export function useAgremiados(page: number = 1, limit: number = 50) {
 /**
  * Fetch single agremiado by ID
  */
-export function useAgremiado(id: number) {
+export function useAgremiado(id: number | string) {
     return useQuery({
         queryKey: ['agremiado', id],
         queryFn: async () => {
@@ -114,7 +114,7 @@ export function useUpdateAgremiado() {
             id,
             data,
         }: {
-            id: number;
+            id: number | string;
             data: UpdateAgremiadoInput;
         }) => {
             const response = await fetch(`${API_BASE}/${id}`, {
@@ -146,7 +146,7 @@ export function useDeleteAgremiado() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (id: number) => {
+        mutationFn: async (id: number | string) => {
             const response = await fetch(`${API_BASE}/${id}`, {
                 method: 'DELETE',
             });

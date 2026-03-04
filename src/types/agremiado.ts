@@ -7,7 +7,7 @@ export type Estado = 'ACTIVO' | 'INACTIVO' | 'SUSPENDIDO' | 'RETIRADO';
 export type Habilitado = 'ACTIVO' | 'INACTIVO';
 
 export interface Agremiado {
-    id: number;
+    id: number | string;
     cop: string;
     nombres: string;
     apellidos: string;
@@ -77,14 +77,15 @@ export const COLEGIO_DISPLAY: Record<Colegio, string> = {
 };
 
 /**
- * Colegio options for select inputs
+ * Colegio options for select inputs (regionales del COP según data.csv)
  */
-export const COLEGIO_OPTIONS = Object.entries(COLEGIO_DISPLAY).map(
-    ([value, label]) => ({
-        value: value as Colegio,
-        label,
-    })
-);
+export const COLEGIO_OPTIONS = [
+    'I-PIURA', 'II-LA LIBERTAD', 'III-LIMA CALLAO', 'IV-AREQUIPA', 'V-ICA',
+    'VI-JUNIN', 'VII-AYACUCHO', 'VIII-PUNO', 'X-CUSCO', 'XI-LAMBAYEQUE',
+    'XII-TACNA', 'XIII-SAN MARTIN', 'XIV-CAJAMARCA', 'XV-ANCASH CHIMBOTE',
+    'XVII-HUANUCO', 'XIX-UCAYALI', 'XX-MOQUEGUA', 'XXI-AMAZONAS',
+    'XXIV-MADRE DE DIOS', 'XXV-PASCO',
+].map((v) => ({ value: v, label: v }));
 
 /**
  * Estado options

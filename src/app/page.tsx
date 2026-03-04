@@ -2,13 +2,17 @@
 
 import * as React from 'react';
 import Image from 'next/image';
-import { useAgremiados } from '@/hooks/useAgremiados';
+import { useAgremiados, useDeleteAgremiado } from '@/hooks/useAgremiados';
 import { BusquedaAgremiados } from '@/components/agremiados/BusquedaAgremiados';
 import { TablaAgremiados } from '@/components/agremiados/TablaAgremiados';
 import { ModalDetalles } from '@/components/agremiados/ModalDetalles';
+import { FormularioRegistro } from '@/components/agremiados/FormularioRegistro';
+import { LoginFooter } from '@/components/auth/LoginFooter';
 import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal';
 import { Pagination } from '@/components/ui/Pagination';
 import { useToast } from '@/components/ui/Toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { exportToCSV, formatDate } from '@/lib/utils';
 import type { Agremiado } from '@/types/agremiado';
 
@@ -50,8 +54,12 @@ export default function HomePage() {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [selectedAgremiado, setSelectedAgremiado] = React.useState<Agremiado | null>(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [agremiadoToEdit, setAgremiadoToEdit] = React.useState<Agremiado | undefined>(undefined);
+  const [isFormModalOpen, setIsFormModalOpen] = React.useState(false);
 
+  const { isAdmin } = useAuth();
   const { data, isLoading } = useAgremiados(currentPage, PAGE_SIZE);
+  const deleteMutation = useDeleteAgremiado();
   const { showToast } = useToast();
 
   const agremiados = data?.data || [];
@@ -61,6 +69,32 @@ export default function HomePage() {
   const handleView = (agremiado: Agremiado) => {
     setSelectedAgremiado(agremiado);
     setIsModalOpen(true);
+  };
+
+  const handleEdit = (agremiado: Agremiado) => {
+    setAgremiadoToEdit(agremiado);
+    setIsFormModalOpen(true);
+  };
+
+  const handleDelete = async (agremiado: Agremiado) => {
+    if (!confirm(`¿Eliminar a ${agremiado.nombres} ${agremiado.apellidos} (COP ${agremiado.cop})?`)) return;
+    try {
+      await deleteMutation.mutateAsync(agremiado.id);
+      showToast('Agremiado eliminado', 'success');
+      if (selectedAgremiado?.id === agremiado.id) setIsModalOpen(false);
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Error al eliminar', 'error');
+    }
+  };
+
+  const handleOpenCreateForm = () => {
+    setAgremiadoToEdit(undefined);
+    setIsFormModalOpen(true);
+  };
+
+  const handleFormSuccess = () => {
+    setIsFormModalOpen(false);
+    setAgremiadoToEdit(undefined);
   };
 
   const handlePageChange = (page: number) => {
@@ -134,7 +168,12 @@ export default function HomePage() {
               <h2 className="text-xl md:text-2xl font-semibold text-[#d4af37] mb-6">
                 Buscar agremiado por COP o Apellidos y Nombres
               </h2>
-              <BusquedaAgremiados onView={handleView} />
+              <BusquedaAgremiados
+                onView={handleView}
+                isAdmin={isAdmin}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
             </div>
           </div>
         )}
@@ -156,10 +195,17 @@ export default function HomePage() {
                   </p>
                 </div>
               </div>
-              <Button variant="accent" onClick={handleExport}>
+              <div className="flex gap-2">
+                {isAdmin && (
+                  <Button variant="primary" onClick={handleOpenCreateForm}>
+                    Registrar
+                  </Button>
+                )}
+                <Button variant="accent" onClick={handleExport}>
                 <DownloadIcon className="w-4 h-4" />
                 Exportar CSV
               </Button>
+              </div>
             </div>
             <div className="p-6">
               {isLoading ? (
@@ -172,6 +218,9 @@ export default function HomePage() {
                 <TablaAgremiados
                     agremiados={agremiados}
                     onView={handleView}
+                    isAdmin={isAdmin}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
                 />
                   <Pagination
                     page={currentPage}
@@ -214,18 +263,38 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="border-t border-gray-200 bg-white mt-12">
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-4">
-          <p className="text-center text-sm text-gray-500">
-            © {new Date().getFullYear()} Colegio de Obstetras del Perú
-          </p>
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-center text-sm text-gray-500">
+              © {new Date().getFullYear()} Colegio de Obstetras del Perú
+            </p>
+            <LoginFooter />
+          </div>
         </div>
       </footer>
 
-      {/* Modal */}
+      {/* Modal Detalles */}
       <ModalDetalles
         agremiado={selectedAgremiado}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        isAdmin={isAdmin}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
+
+      {/* Modal Formulario (crear/editar) */}
+      <Modal
+        isOpen={isFormModalOpen}
+        onClose={() => { setIsFormModalOpen(false); setAgremiadoToEdit(undefined); }}
+        title={agremiadoToEdit ? 'Editar Agremiado' : 'Registrar Agremiado'}
+        size="lg"
+      >
+        <FormularioRegistro
+          key={agremiadoToEdit?.id ?? 'new'}
+          agremiado={agremiadoToEdit}
+          onSuccess={handleFormSuccess}
+        />
+      </Modal>
     </div>
   );
 }
