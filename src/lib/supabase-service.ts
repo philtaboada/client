@@ -125,3 +125,35 @@ export async function deleteAgremiadoFromSupabase(id: string): Promise<void> {
     const { error } = await supabase.from('agremiados').delete().eq('id', id);
     if (error) throw error;
 }
+
+const BATCH_SIZE = 100;
+
+export type AgremiadoImportRow = {
+    cop: string;
+    nombres: string;
+    apellidos: string;
+    colegio: string;
+    estado: string;
+    habilitado: string;
+};
+
+export async function bulkUpsertAgremiados(
+    rows: AgremiadoImportRow[]
+): Promise<{ imported: number; errors: number }> {
+    const supabase = getSupabaseAdmin();
+    let imported = 0;
+    let errors = 0;
+    for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+        const batch = rows.slice(i, i + BATCH_SIZE);
+        const { error } = await supabase.from('agremiados').upsert(batch, {
+            onConflict: 'cop',
+            ignoreDuplicates: false,
+        });
+        if (error) {
+            errors += batch.length;
+        } else {
+            imported += batch.length;
+        }
+    }
+    return { imported, errors };
+}

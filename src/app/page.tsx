@@ -7,6 +7,7 @@ import { BusquedaAgremiados } from '@/components/agremiados/BusquedaAgremiados';
 import { TablaAgremiados } from '@/components/agremiados/TablaAgremiados';
 import { ModalDetalles } from '@/components/agremiados/ModalDetalles';
 import { FormularioRegistro } from '@/components/agremiados/FormularioRegistro';
+import { ImportarDatos } from '@/components/agremiados/ImportarDatos';
 import { LoginFooter } from '@/components/auth/LoginFooter';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
@@ -195,11 +196,14 @@ export default function HomePage() {
                   </p>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {isAdmin && (
-                  <Button variant="primary" onClick={handleOpenCreateForm}>
-                    Registrar
-                  </Button>
+                  <>
+                    <Button variant="primary" onClick={handleOpenCreateForm}>
+                      Registrar
+                    </Button>
+                    <ImportarDatos />
+                  </>
                 )}
                 <Button variant="accent" onClick={handleExport}>
                 <DownloadIcon className="w-4 h-4" />

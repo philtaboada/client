@@ -1,8 +1,10 @@
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 
 /**
  * Modal component with overlay and animations
+ * Renders via portal to document.body to avoid clipping by parent overflow
  */
 
 export interface ModalProps {
@@ -52,9 +54,9 @@ export function Modal({
         lg: 'max-w-4xl',
     };
 
-    return (
+    const modalContent = (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-in fade-in duration-200"
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 animate-in fade-in duration-200"
             onClick={onClose}
         >
             <div
@@ -87,4 +89,6 @@ export function Modal({
             </div>
         </div>
     );
+
+    return createPortal(modalContent, document.body);
 }

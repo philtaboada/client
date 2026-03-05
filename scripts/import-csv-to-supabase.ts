@@ -1,7 +1,7 @@
 /**
- * Script para importar data.csv a Supabase
- * Ejecutar: npx ts-node --esm scripts/import-csv-to-supabase.ts
- * O: npm run import:csv
+ * Script para importar CSV a Supabase
+ * Ejecutar: npm run import:csv
+ * O con archivo específico: npm run import:csv -- data_2.csv
  *
  * Requiere: .env con NEXT_PUBLIC_SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY
  */
@@ -16,7 +16,7 @@ config({ path: join(process.cwd(), '.env') });
 const BATCH_SIZE = 100;
 
 function parseCsvLine(line: string): string[] {
-    return line.split(',').map((cell) => cell.trim());
+    return line.split(',').map((cell) => cell.trim().replace(/^"|"$/g, ''));
 }
 
 function mapRowToAgremiado(row: string[]): {
@@ -63,7 +63,9 @@ async function main(): Promise<void> {
         process.exit(1);
     }
 
-    const csvPath = join(process.cwd(), 'data.csv');
+    const csvFile = process.argv[2] || 'data_2.csv';
+    const csvPath = join(process.cwd(), csvFile);
+    console.log(`Leyendo archivo: ${csvFile}`);
     const content = readFileSync(csvPath, 'utf-8');
     const lines = content.split(/\r?\n/);
     const headerIndex = lines.findIndex(
