@@ -81,10 +81,18 @@ export const COLEGIO_DISPLAY: Record<Colegio, string> = {
  */
 export const COLEGIO_OPTIONS = [
     'I-PIURA', 'II-LA LIBERTAD', 'III-LIMA CALLAO', 'IV-AREQUIPA', 'V-ICA',
-    'VI-JUNIN', 'VII-AYACUCHO', 'VIII-PUNO', 'X-CUSCO', 'XI-LAMBAYEQUE',
-    'XII-TACNA', 'XIII-SAN MARTIN', 'XIV-CAJAMARCA', 'XV-ANCASH CHIMBOTE',
-    'XVII-HUANUCO', 'XIX-UCAYALI', 'XX-MOQUEGUA', 'XXI-AMAZONAS',
+    'VI-JUNIN', 'VII-AYACUCHO', 'VIII-PUNO',
+    'IX – ANCASH – HUARAZ',  // ← Insertado en orden numérico
+    'X-CUSCO', 'XI-LAMBAYEQUE', 'XII-TACNA', 'XIII-SAN MARTIN', 'XIV-CAJAMARCA',
+    'XV-ANCASH CHIMBOTE',
+    'XVI – LORETO',  // ← Insertado en orden numérico
+    'XVII-HUANUCO',
+    'XVIII – TUMBES',  // ← Insertado en orden numérico
+    'XIX-UCAYALI', 'XX-MOQUEGUA', 'XXI-AMAZONAS',
+    'XXII – HUANCAVELICA',  // ← Insertado en orden numérico
+    'XXIII – APURIMAC',  // ← Insertado en orden numérico
     'XXIV-MADRE DE DIOS', 'XXV-PASCO',
+    'XXVI – ANDAHUAYLAS',  // ← Insertado en orden numérico
 ].map((v) => ({ value: v, label: v }));
 
 /**
